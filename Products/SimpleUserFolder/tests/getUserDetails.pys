@@ -1,0 +1,23 @@
+## Script (Python) "getUserDetails"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=name
+##title=
+##
+doc = getattr(container,name,None)
+
+if doc is None:
+  return None
+
+dict = {
+  'password' : doc.password,
+  'roles'    : doc.roles
+  }
+
+if getattr(doc,'extra',None):
+  dict.update(doc.extra)
+
+return dict

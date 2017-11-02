@@ -1,0 +1,14 @@
+## Script (Python) "addUser"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=name, password, roles
+##title=
+##
+container.manage_addDTMLDocument(id=name,title='')
+user = getattr(context,name)
+user.manage_addProperty('password',password,'string')
+user.manage_addProperty('roles',roles,'lines')
+return 'done'

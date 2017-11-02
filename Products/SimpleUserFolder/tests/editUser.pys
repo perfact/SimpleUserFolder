@@ -1,0 +1,21 @@
+## Script (Python) "editUser"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=name, password, roles
+##title=
+##
+user = getattr(container,name)
+
+to_change = {
+    'roles':roles,
+    }
+
+if password is not None:
+    to_change['password'] = password
+    
+user.manage_changeProperties(**to_change)
+
+return 'done'
