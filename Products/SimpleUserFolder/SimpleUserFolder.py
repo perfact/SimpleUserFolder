@@ -15,7 +15,7 @@ from App.class_init import InitializeClass
 from OFS.ObjectManager import ObjectManager
 from Shared.DC.ZRDB.Results import Results
 from sys import exc_info
-from User import User
+from .User import User
 from zExceptions import Redirect, Unauthorized
 
 import logging
@@ -109,7 +109,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
     security.declareProtected(ManageUsersPermission,'getUser')
     def getUsers(self):
         """Return a list of user objects"""
-        return map(self.getUser,self.getUserNames())
+        return list(map(self.getUser,self.getUserNames()))
 
 
     def validate(self, request, auth='', roles=_noroles):
@@ -142,7 +142,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
                 logger.warn('Problem with getAuth detected!')
                 username = None
             if username is False:
-                raise Redirect, '/'
+                raise Redirect('/')
             if username:
                 user = self.getUser(username)
         if not user:
@@ -171,14 +171,14 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
            method is responsible for performing any needed encryption."""
 
         if kw:
-            raise ValueError, 'keyword arguments passed to _doAddUser'
+            raise ValueError('keyword arguments passed to _doAddUser')
 
         if domains:
-            raise ValueError, 'Simple User Folder does not support domains'
+            raise ValueError('Simple User Folder does not support domains')
 
         addUser = self._getMethod('addUser')
         if addUser is None:
-            raise UnconfiguredException, 'Addition of users has not been configured'
+            raise UnconfiguredException('Addition of users has not been configured')
 
         addUser(name=name,password=password,roles=roles)
 
@@ -188,14 +188,14 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
            method is responsible for performing any needed encryption."""
 
         if kw:
-            raise ValueError, 'keyword arguments passed to _doChangeUser'
+            raise ValueError('keyword arguments passed to _doChangeUser')
 
         if domains:
-            raise ValueError, 'Simple User Folder does not support domains'
+            raise ValueError('Simple User Folder does not support domains')
 
         changeUser = self._getMethod('editUser')
         if changeUser is None:
-            raise UnconfiguredException, 'Editing of users has not been configured'
+            raise UnconfiguredException('Editing of users has not been configured')
 
         changeUser(name=name,password=password,roles=roles)
 
@@ -204,7 +204,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
 
         delUser = self._getMethod('deleteUser')
         if delUser is None:
-            raise UnconfiguredException, 'Deleting of users has not been configured'
+            raise UnconfiguredException('Deleting of users has not been configured')
 
         for name in names:
             delUser(name=name)

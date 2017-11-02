@@ -6,7 +6,10 @@
 # See license.txt for more details.
 
 from AccessControl.User import BasicUser
-from cPickle import UnpickleableError
+try:
+    import cPickle
+except ImportError:
+    import pickle as cPickle
 
 class User(BasicUser):
 
@@ -26,14 +29,14 @@ class User(BasicUser):
 
     def __setattr__(self,name,value):
         # This type of user object should never get modified
-        raise AttributeError, 'This object is immutable'
+        raise AttributeError('This object is immutable')
 
     def __getitem__(self,name):
         return self.extra[name]
     
     def __getstate__(self):
         """Don't let simple user objects get pickled"""
-        raise UnpickleableError, "This object cannot be pickled"
+        raise cPickle.UnpickleableError("This object cannot be pickled")
 
     def _getPassword(self):
         """Return the password of the user."""

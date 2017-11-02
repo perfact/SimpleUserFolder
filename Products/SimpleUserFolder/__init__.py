@@ -5,8 +5,8 @@
 # http://www.opensource.org/licenses/mit-license.html
 # See license.txt for more details.
 
-from SimpleUserFolder import SimpleUserFolder
-from SimpleUserFolder import addSimpleUserFolder
+from .SimpleUserFolder import SimpleUserFolder
+from .SimpleUserFolder import addSimpleUserFolder
 
 def initialize( context ):
     context.registerClass(SimpleUserFolder,
