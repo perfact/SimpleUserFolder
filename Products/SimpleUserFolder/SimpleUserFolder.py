@@ -137,9 +137,10 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
             if auth: auth_name, auth_password = BasicUserFolder.identify(self, auth)
             try:
                 username = getAuth(name=auth_name, password=auth_password)
-            except:
+            except Exception as err:
                 # raise
                 logger.warn('Problem with getAuth detected!')
+                logger.exception(err)
                 username = None
             if username is False:
                 raise Redirect('/')
