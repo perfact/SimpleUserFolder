@@ -8,7 +8,8 @@
 from .SimpleUserFolder import SimpleUserFolder
 from .SimpleUserFolder import addSimpleUserFolder
 
-def initialize( context ):
+
+def initialize(context):
     context.registerClass(SimpleUserFolder,
                           constructors=(addSimpleUserFolder,),
                           icon='www/suf.gif')

@@ -11,29 +11,30 @@ try:
 except ImportError:
     import pickle as cPickle
 
+
 class User(BasicUser):
 
     # we don't want to support the domains thing
     domains = ()
 
-    def __init__(self,dict):
+    def __init__(self, user_dict):
         # bypass immutability
         d = self.__dict__
-        d['__'] = dict['password']
-        del dict['password']
-        d['name'] = dict['name']
-        del dict['name']
-        d['roles'] = dict['roles']
-        del dict['roles']
-        d['extra'] = dict
+        d['__'] = user_dict['password']
+        del user_dict['password']
+        d['name'] = user_dict['name']
+        del user_dict['name']
+        d['roles'] = user_dict['roles']
+        del user_dict['roles']
+        d['extra'] = user_dict
 
-    def __setattr__(self,name,value):
+    def __setattr__(self, name, value):
         # This type of user object should never get modified
         raise AttributeError('This object is immutable')
 
-    def __getitem__(self,name):
+    def __getitem__(self, name):
         return self.extra[name]
-    
+
     def __getstate__(self):
         """Don't let simple user objects get pickled"""
         raise cPickle.UnpickleableError("This object cannot be pickled")
@@ -50,7 +51,7 @@ class User(BasicUser):
 
     def getRoles(self):
         """Return the list of roles assigned to a user."""
-        return tuple(self.roles) + ('Authenticated',)
+        return tuple(self.roles) + ('Authenticated', )
 
     def getUserName(self):
         """Return the username of a user"""
