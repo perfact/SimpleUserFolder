@@ -14,6 +14,12 @@ from Shared.DC.ZRDB.Results import Results
 from .User import User
 from zExceptions import Redirect
 
+try:
+    from Zope2.App.startup import RetryError
+except ImportError:
+    # If the retry feature is not present, ignore it.
+    RetryError = None
+
 import logging
 
 ManageUsersPermission = 'Manage users'
@@ -139,6 +145,8 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
                 auth_name, auth_password = BasicUserFolder.identify(self, auth)
             try:
                 username = getAuth(name=auth_name, password=auth_password)
+            except RetryError:
+                raise
             except Exception as err:
                 # raise
                 logger.warn('Problem with getAuth detected!')
