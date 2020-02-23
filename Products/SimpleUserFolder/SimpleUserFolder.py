@@ -109,7 +109,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
             user_dict['name'] = name
             u = User(user_dict)
             return u
-        except StandardError:
+        except Exception:
             logger.error('Error getting user %r', name,
                          exc_info=True)
             return None
