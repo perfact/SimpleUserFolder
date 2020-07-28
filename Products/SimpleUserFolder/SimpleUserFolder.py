@@ -15,10 +15,10 @@ from .User import User
 from zExceptions import Redirect
 
 try:
-    from Zope2.App.startup import RetryError
+    from Zope2.App.startup import ConflictError
 except ImportError:
-    # If the retry feature is not present, ignore it.
-    RetryError = None
+    # With Zope4, this changed
+    from ZODB.POSException import ConflictError
 
 import logging
 
@@ -145,7 +145,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
                 auth_name, auth_password = BasicUserFolder.identify(self, auth)
             try:
                 username = getAuth(name=auth_name, password=auth_password)
-            except RetryError:
+            except ConflictError:
                 raise
             except Exception as err:
                 # raise
