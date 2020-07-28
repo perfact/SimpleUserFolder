@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '3.0'
+version = '0.1+perfact.1'
 
 setup(name='Products.SimpleUserFolder',
       version=version,
