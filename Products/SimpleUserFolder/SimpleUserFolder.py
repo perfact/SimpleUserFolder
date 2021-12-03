@@ -157,8 +157,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
             if username:
                 user = self.getUser(username)
         if not user:
-            basic = BasicUserFolder.validate(self, request, auth, roles)
-            return basic
+            return None
 
         # The following code snippet is taken from BasicUserFolder:
         request._auth = 'basic %s:hiddenpw' % username
