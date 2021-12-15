@@ -157,6 +157,14 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
             if username:
                 user = self.getUser(username)
         if not user:
+            # Deprecation warning: If the user is not found, we should not
+            # check user details and allow to still authenticate with basic
+            # auth, but some code in the field abuses the fact that
+            # getUserDetails is called to initialize the user's session. So we
+            # call it here even though we do not use the result.
+            details = self._getMethod('getUserDetails')
+            if details:
+                details(name=None)
             return None
 
         # The following code snippet is taken from BasicUserFolder:
