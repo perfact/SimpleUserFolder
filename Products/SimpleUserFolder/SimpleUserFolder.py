@@ -7,12 +7,12 @@
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.SimpleObjectPolicies import _noroles
-from AccessControl.User import BasicUserFolder
 from AccessControl.class_init import InitializeClass
+from AccessControl.unauthorized import Unauthorized
 from OFS.ObjectManager import ObjectManager
+from OFS.userfolder import BasicUserFolder
 from Shared.DC.ZRDB.Results import Results
 from .User import User
-from zExceptions import Redirect
 
 try:
     from Zope2.App.startup import ConflictError
@@ -72,6 +72,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
         return getattr(folder, methodName, None)
 
     security.declareProtected(ManageUsersPermission, 'getUserNames')
+
     def getUserNames(self):
         """Return a list of usernames"""
         getUserNames = self._getMethod('getUserIds')
@@ -84,6 +85,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
         return names
 
     security.declareProtected(ManageUsersPermission, 'getUser')
+
     def getUser(self, name):
         """Return the named user object or None"""
         try:
@@ -115,6 +117,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
             return None
 
     security.declareProtected(ManageUsersPermission, 'getUsers')
+
     def getUsers(self):
         """Return a list of user objects"""
         return list(map(self.getUser, self.getUserNames()))
@@ -153,18 +156,10 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
                 logger.exception(err)
                 username = None
             if username is False:
-                raise Redirect('/')
+                raise Unauthorized
             if username:
                 user = self.getUser(username)
         if not user:
-            # Deprecation warning: If the user is not found, we should not
-            # check user details and allow to still authenticate with basic
-            # auth, but some code in the field abuses the fact that
-            # getUserDetails is called to initialize the user's session. So we
-            # call it here even though we do not use the result.
-            details = self._getMethod('getUserDetails')
-            if details:
-                details(name=None)
             return None
 
         # The following code snippet is taken from BasicUserFolder:
