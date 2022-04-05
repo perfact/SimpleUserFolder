@@ -8,7 +8,6 @@
 from AccessControl import ClassSecurityInfo
 from AccessControl.SimpleObjectPolicies import _noroles
 from AccessControl.class_init import InitializeClass
-from AccessControl.unauthorized import Unauthorized
 from OFS.ObjectManager import ObjectManager
 from OFS.userfolder import BasicUserFolder
 from Shared.DC.ZRDB.Results import Results
@@ -155,27 +154,22 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
                 logger.warn('Problem with getAuth detected!')
                 logger.exception(err)
                 username = None
-            if username is False:
-                raise Unauthorized
             if username:
                 user = self.getUser(username)
-        if not user:
-            return None
 
-        # The following code snippet is taken from BasicUserFolder:
-        request._auth = 'basic %s:hiddenpw' % username
+        if username:
+            request._auth = 'basic %s:hiddenpw' % username
 
         # We found a user and the user wasn't the emergency user.
         # We need to authorize the user against the published object.
-        if self.authorize(user, a, c, n, v, roles):
+        if user and self.authorize(user, a, c, n, v, roles):
             return user.__of__(self)
         # That didn't work.  Try to authorize the anonymous user.
-        elif self._isTop() and self.authorize(
-                self._nobody, a, c, n, v, roles):
+        elif self.authorize(self._nobody, a, c, n, v, roles):
             return self._nobody.__of__(self)
         else:
-            # we can't authorize the user, and we either can't authorize
-            # nobody against the published object or we're not top-level
+            # we can't authorize the user, and we can't authorize
+            # nobody against the published object
             return None
 
     def _doAddUser(self, name, password, roles, domains, **kw):
