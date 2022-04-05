@@ -172,8 +172,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
         ):
             return self._nobody.__of__(self)
         else:
-            # we can't authorize the user, and we can't authorize
-            # nobody against the published object
+            # we can't authorize the user and we need to ask a higher level
             return None
 
     def _doAddUser(self, name, password, roles, domains, **kw):
