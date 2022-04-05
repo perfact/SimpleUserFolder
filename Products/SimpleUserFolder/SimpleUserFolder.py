@@ -7,12 +7,11 @@
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.SimpleObjectPolicies import _noroles
-from AccessControl.User import BasicUserFolder
 from AccessControl.class_init import InitializeClass
 from OFS.ObjectManager import ObjectManager
+from OFS.userfolder import BasicUserFolder
 from Shared.DC.ZRDB.Results import Results
 from .User import User
-from zExceptions import Redirect
 
 try:
     from Zope2.App.startup import ConflictError
@@ -72,6 +71,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
         return getattr(folder, methodName, None)
 
     security.declareProtected(ManageUsersPermission, 'getUserNames')
+
     def getUserNames(self):
         """Return a list of usernames"""
         getUserNames = self._getMethod('getUserIds')
@@ -84,6 +84,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
         return names
 
     security.declareProtected(ManageUsersPermission, 'getUser')
+
     def getUser(self, name):
         """Return the named user object or None"""
         try:
@@ -115,6 +116,7 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
             return None
 
     security.declareProtected(ManageUsersPermission, 'getUsers')
+
     def getUsers(self):
         """Return a list of user objects"""
         return list(map(self.getUser, self.getUserNames()))
@@ -152,35 +154,25 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
                 logger.warn('Problem with getAuth detected!')
                 logger.exception(err)
                 username = None
-            if username is False:
-                raise Redirect('/')
             if username:
                 user = self.getUser(username)
-        if not user:
-            # Deprecation warning: If the user is not found, we should not
-            # check user details and allow to still authenticate with basic
-            # auth, but some code in the field abuses the fact that
-            # getUserDetails is called to initialize the user's session. So we
-            # call it here even though we do not use the result.
-            details = self._getMethod('getUserDetails')
-            if details:
-                details(name=None)
-            return None
 
-        # The following code snippet is taken from BasicUserFolder:
-        request._auth = 'basic %s:hiddenpw' % username
+        if username:
+            request._auth = 'basic %s:hiddenpw' % username
 
         # We found a user and the user wasn't the emergency user.
         # We need to authorize the user against the published object.
-        if self.authorize(user, a, c, n, v, roles):
+        if user and self.authorize(user, a, c, n, v, roles):
             return user.__of__(self)
         # That didn't work.  Try to authorize the anonymous user.
-        elif self._isTop() and self.authorize(
-                self._nobody, a, c, n, v, roles):
+        elif (
+            (self._isTop() or username is False)
+            and
+            self.authorize(self._nobody, a, c, n, v, roles)
+        ):
             return self._nobody.__of__(self)
         else:
-            # we can't authorize the user, and we either can't authorize
-            # nobody against the published object or we're not top-level
+            # we can't authorize the user and we need to ask a higher level
             return None
 
     def _doAddUser(self, name, password, roles, domains, **kw):

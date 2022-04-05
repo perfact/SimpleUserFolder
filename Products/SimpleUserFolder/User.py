@@ -5,7 +5,7 @@
 # http://www.opensource.org/licenses/mit-license.html
 # See license.txt for more details.
 
-from AccessControl.User import BasicUser
+from AccessControl.users import BasicUser
 try:
     import cPickle
 except ImportError:
