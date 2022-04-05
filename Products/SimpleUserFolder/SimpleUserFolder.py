@@ -165,7 +165,11 @@ class SimpleUserFolder(ObjectManager, BasicUserFolder):
         if user and self.authorize(user, a, c, n, v, roles):
             return user.__of__(self)
         # That didn't work.  Try to authorize the anonymous user.
-        elif self.authorize(self._nobody, a, c, n, v, roles):
+        elif (
+            (self._isTop() or username is False)
+            and
+            self.authorize(self._nobody, a, c, n, v, roles)
+        ):
             return self._nobody.__of__(self)
         else:
             # we can't authorize the user, and we can't authorize
